@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07111f">
+<title>Vedlikehold Viking Fjord</title>
+<style>
+:root{--bg:#07111f;--card:#112238;--text:#f8fafc;--muted:#9fb0c3;--line:rgba(255,255,255,.1);--shadow:0 18px 50px rgba(0,0,0,.3)}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 12% 0,#183b68 0,transparent 31%),linear-gradient(145deg,#07111f,#0b1727 58%,#07111f);color:var(--text);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}.app{max-width:1240px;margin:auto;padding:24px 22px 48px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}.brand{display:flex;align-items:center;gap:13px}.logo{width:50px;height:50px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,#1d4ed8,#38bdf8);box-shadow:0 12px 28px rgba(59,130,246,.32);font-size:26px}.brand h1{margin:0;font-size:clamp(18px,2.4vw,25px);letter-spacing:.03em}.brand p{margin:1px 0 0;color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase}.user{display:flex;align-items:center;gap:11px;border:1px solid var(--line);background:rgba(17,34,56,.75);padding:7px 8px 7px 13px;border-radius:18px}.usertext{text-align:right}.usertext b,.usertext span{display:block}.usertext span{font-size:11px;color:var(--muted)}.avatar{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#2563eb,#60a5fa);font-weight:900}.hero{position:relative;overflow:hidden;padding:clamp(27px,5vw,48px);border:1px solid var(--line);border-radius:30px;background:linear-gradient(125deg,rgba(27,53,86,.97),rgba(12,26,44,.96));box-shadow:var(--shadow)}.hero:after{content:"";position:absolute;width:290px;height:290px;border-radius:50%;right:-100px;top:-150px;background:rgba(56,189,248,.12)}.status{display:inline-flex;color:#93c5fd;background:rgba(59,130,246,.14);border:1px solid rgba(96,165,250,.22);padding:7px 11px;border-radius:999px;font-size:11px;font-weight:800}.hero h2{max-width:720px;font-size:clamp(27px,5vw,44px);line-height:1.1;margin:15px 0 10px}.hero p{max-width:680px;color:#c2cfdd;margin:0;font-size:clamp(14px,2vw,17px)}.head{display:flex;align-items:end;justify-content:space-between;margin:31px 2px 15px}.head h3{font-size:20px;margin:0}.head span{color:var(--muted);font-size:12px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.module{position:relative;min-height:245px;width:100%;overflow:hidden;text-align:left;color:var(--text);padding:23px;border:1px solid var(--line);border-radius:25px;background:linear-gradient(155deg,rgba(25,43,66,.98),rgba(12,26,44,.98));box-shadow:0 13px 36px rgba(0,0,0,.22);cursor:pointer;transition:.2s}.module:hover,.module:focus-visible{transform:translateY(-5px);border-color:rgba(255,255,255,.22);box-shadow:0 20px 45px rgba(0,0,0,.34);outline:none}.module:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-85px;bottom:-95px;background:var(--glow)}.icon{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;font-size:29px;background:var(--soft);border:1px solid var(--edge)}.module h4{font-size:23px;margin:21px 0 6px}.module p{margin:0;color:#aebdcd;max-width:280px}.action{position:absolute;left:23px;bottom:21px;color:var(--accent);font-size:12px;font-weight:900;letter-spacing:.03em}.blue{--soft:rgba(59,130,246,.15);--edge:rgba(96,165,250,.27);--accent:#82b6ff;--glow:rgba(59,130,246,.18)}.green{--soft:rgba(34,197,94,.15);--edge:rgba(74,222,128,.27);--accent:#72e299;--glow:rgba(34,197,94,.18)}.violet{--soft:rgba(139,92,246,.16);--edge:rgba(167,139,250,.27);--accent:#bea8fa;--glow:rgba(139,92,246,.18)}.soon{opacity:.6;cursor:not-allowed}.soon:hover{transform:none}.soon .action{color:var(--muted)}footer{display:flex;justify-content:space-between;gap:12px;padding-top:33px;color:#62778d;font-size:11px}.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,100px);opacity:0;background:#fff;color:#102033;padding:12px 16px;border-radius:13px;box-shadow:var(--shadow);font-weight:800;transition:.25s;z-index:10}.toast.show{transform:translate(-50%,0);opacity:1}
+@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:620px){.app{padding:15px 13px 34px}.brand p,.usertext{display:none}.user{padding:5px}.logo{width:44px;height:44px}.hero{border-radius:24px}.grid{grid-template-columns:1fr}.module{min-height:215px}footer{display:block;text-align:center}footer span{display:block;margin:4px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header class="top"><div class="brand"><div class="logo">⚓</div><div><h1>VEDLIKEHOLD VIKING FJORD</h1><p>Maintenance platform</p></div></div><div class="user"><div class="usertext"><b>Daniel</b><span>Administrator</span></div><div class="avatar">D</div></div></header>
+<section class="hero"><span class="status">● SYSTEM ONLINE</span><h2>Wszystkie narzędzia Vedlikehold w jednym miejscu.</h2><p>Wybierz moduł, aby kontynuować. Shift Plan i Hours są już podłączone. Strapex Control pozostaje wyłączony do czasu utworzenia projektu.</p></section>
+<div class="head"><h3>Twoje moduły</h3><span>Wybierz aplikację</span></div>
+<section class="grid" aria-label="Moduły">
+<button class="module blue" data-url="https://daniosagand98.github.io/ShiftControl/" type="button"><div class="icon">📅</div><h4>Shift Plan</h4><p>Grafik, obsada, wolne, konta oraz planowanie Vakt.</p><span class="action">OTWÓRZ →</span></button>
+<button class="module green soon" data-name="Strapex Control" type="button" aria-disabled="true"><div class="icon">🔧</div><h4>Strapex Control</h4><p>Status urządzeń, produkcja, serwis, naprawy i historia.</p><span class="action">W PRZYGOTOWANIU</span></button>
+<button class="module violet" data-url="https://daniosagand98.github.io/vf/" type="button"><div class="icon">⏱️</div><h4>Hours</h4><p>Godziny pracy, nadgodziny, bank godzin, wypłata i raporty.</p><span class="action">OTWÓRZ →</span></button>
+<button class="module soon" data-name="Vakt" type="button" aria-disabled="true"><div class="icon">🚨</div><h4>Vakt</h4><p>Osobny moduł planowania dyżurów i gotowości.</p><span class="action">WKRÓTCE</span></button>
+<button class="module soon" data-name="Parts" type="button" aria-disabled="true"><div class="icon">📦</div><h4>Parts</h4><p>Magazyn części, zamówienia, dostawcy i stany minimalne.</p><span class="action">WKRÓTCE</span></button>
+<button class="module soon" data-name="Machines" type="button" aria-disabled="true"><div class="icon">🏭</div><h4>Machines</h4><p>Przeglądy maszyn, kontrole techniczne i historia prac.</p><span class="action">WKRÓTCE</span></button>
+</section>
+<footer><span>Vedlikehold Viking Fjord</span><span>One account. All maintenance tools.</span></footer>
+</main>
+<div id="toast" class="toast" role="status"></div>
+<script>
+const toast=document.getElementById('toast');
+function showMessage(text){toast.textContent=text;toast.classList.add('show');clearTimeout(showMessage.timer);showMessage.timer=setTimeout(()=>toast.classList.remove('show'),2400)}
+document.querySelectorAll('.module').forEach(button=>button.addEventListener('click',()=>{
+  const url=button.dataset.url;
+  if(url){window.location.href=url;return;}
+  showMessage((button.dataset.name||'Ten moduł')+' nie jest jeszcze dostępny.');
+}));
+</script>
+</body>
+</html>
