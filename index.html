@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Vedlikehold VF">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -47,16 +47,11 @@
 .accountMenu{z-index:9999!important;isolation:isolate!important}
 .hero,.head,.grid{position:relative;z-index:1}
 
-/* LOBBY V2.2 FIX */
-.usertext .logout{display:none!important}
-.module .icon{background:rgba(59,130,246,.14)!important;border:1px solid rgba(96,165,250,.26)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
-.module:nth-child(2) .icon{background:rgba(34,197,94,.14)!important;border-color:rgba(74,222,128,.26)!important}
-.module:nth-child(3) .icon{background:rgba(139,92,246,.15)!important;border-color:rgba(167,139,250,.26)!important}
-.module:nth-child(4) .icon{background:rgba(249,115,22,.14)!important;border-color:rgba(251,146,60,.26)!important}
-.module:nth-child(5) .icon{background:rgba(245,158,11,.14)!important;border-color:rgba(251,191,36,.26)!important}
-.module:nth-child(6) .icon{background:rgba(100,116,139,.18)!important;border-color:rgba(148,163,184,.26)!important}
-.moduleViewer{position:fixed!important;inset:0!important;padding:0!important;background:#07111f!important}
-.moduleViewer iframe{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border:0!important;background:#07111f!important}
+/* STATUS BAR GLOW FIX */
+html,body{background:#07111f!important}
+body:before{content:"";position:fixed;z-index:10000;left:0;right:0;top:0;height:env(safe-area-inset-top);background:#07111f;pointer-events:none}
+.top{background:#07111f!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.moduleViewer,.moduleViewer iframe{background:#07111f!important}
 </style>
 </head>
 <body>
@@ -73,7 +68,7 @@
   </form>
 </div>
 <main id="app" class="app hidden">
-<header class="top"><div class="brand"><div class="logo">⚓</div><div><h1>VEDLIKEHOLD VIKING FJORD</h1><p>Maintenance platform</p></div></div><div class="user"><div class="usertext"><b id="userName">Użytkownik</b><span id="userRole">worker</span><button id="logoutBtn" class="logout hidden" type="button" aria-hidden="true" tabindex="-1">Wyloguj</button></div><button id="avatar" class="avatar" type="button" aria-label="Menu użytkownika">U</button><div id="accountMenu" class="accountMenu hidden"><div id="profilePanel" class="profilePanel"></div><div class="languageRow"><button type="button" data-global-lang="pl">🇵🇱</button><button type="button" data-global-lang="en">🇬🇧</button><button type="button" data-global-lang="no">🇳🇴</button></div><button id="usersBtn" type="button">👥 <span data-t="users">Użytkownicy</span></button><button id="settingsBtn" type="button">⚙️ <span data-t="settings">Ustawienia</span></button><button id="menuLogoutBtn" class="danger" type="button">🚪 <span data-t="logout">Wyloguj</span></button></div></div></header>
+<header class="top"><div class="brand"><div class="logo">⚓</div><div><h1>VEDLIKEHOLD VIKING FJORD</h1><p>Maintenance platform</p></div></div><div class="user"><div class="usertext"><b id="userName">Użytkownik</b><span id="userRole">worker</span><button id="logoutBtn" class="logout" type="button">Wyloguj</button></div><button id="avatar" class="avatar" type="button" aria-label="Menu użytkownika">U</button><div id="accountMenu" class="accountMenu hidden"><div id="profilePanel" class="profilePanel"></div><div class="languageRow"><button type="button" data-global-lang="pl">🇵🇱</button><button type="button" data-global-lang="en">🇬🇧</button><button type="button" data-global-lang="no">🇳🇴</button></div><button id="usersBtn" type="button">👥 <span data-t="users">Użytkownicy</span></button><button id="settingsBtn" type="button">⚙️ <span data-t="settings">Ustawienia</span></button><button id="menuLogoutBtn" class="danger" type="button">🚪 <span data-t="logout">Wyloguj</span></button></div></div></header>
 <section class="hero"><span class="status">● SYSTEM ONLINE</span><h2 data-t="hero">Wszystkie narzędzia Vedlikehold w jednym miejscu.</h2><p id="welcome">Wybierz moduł, aby kontynuować.</p></section>
 <div class="head"><h3 data-t="modules">Twoje moduły</h3><span data-t="chooseApp">Wybierz aplikację</span></div>
 <section class="grid" aria-label="Moduły">
@@ -86,7 +81,7 @@
 </section>
 <footer class="appFooter">Vedlikehold Viking Fjord v1.0<br>Created and designed by: Daniel Wawrzyniak</footer>
 </main>
-<section id="adminPanel" class="adminPanel"><div class="adminSheet"><div class="adminHead"><h2 data-t="users">Użytkownicy</h2><button id="closeAdmin" class="closeAdmin" type="button">✕</button></div><p id="adminStatus" class="adminStatus"></p><div id="usersList" class="usersList"></div></div></section><section id="moduleViewer" class="moduleViewer" aria-label="Otwarty moduł"><button id="viewerBack" class="hidden" type="button" tabindex="-1" aria-hidden="true">Lobby</button><b id="viewerTitle" class="hidden">Moduł</b><button id="viewerReload" class="hidden" type="button" tabindex="-1" aria-hidden="true">Odśwież</button><iframe id="moduleFrame" title="Moduł"></iframe></section>
+<section id="adminPanel" class="adminPanel"><div class="adminSheet"><div class="adminHead"><h2 data-t="users">Użytkownicy</h2><button id="closeAdmin" class="closeAdmin" type="button">✕</button></div><p id="adminStatus" class="adminStatus"></p><div id="usersList" class="usersList"></div></div></section><section id="moduleViewer" class="moduleViewer" aria-label="Otwarty moduł"><div class="viewerBar"><button id="viewerBack" type="button">🏠 Lobby</button><b id="viewerTitle">Moduł</b><button id="viewerReload" type="button" aria-label="Odśwież">↻</button></div><iframe id="moduleFrame" title="Moduł"></iframe></section>
 <div id="toast" class="toast" role="status"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -102,12 +97,12 @@ loginForm.addEventListener('submit',async e=>{e.preventDefault();loginMsg.textCo
 document.getElementById('logoutBtn').addEventListener('click',async()=>{await db.auth.signOut();openLogin();showMessage('Wylogowano.')});
 const moduleViewer=document.getElementById('moduleViewer'),moduleFrame=document.getElementById('moduleFrame'),viewerTitle=document.getElementById('viewerTitle');
 function closeModule(){moduleViewer.classList.remove('open');moduleFrame.src='about:blank';document.body.style.overflow=''}
-document.querySelectorAll('.module').forEach(button=>button.addEventListener('click',()=>{const url=button.dataset.url;if(url){viewerTitle.textContent=button.querySelector('h4')?.textContent||'Moduł';moduleFrame.onload=()=>{try{moduleFrame.contentWindow.postMessage({type:'vf-language',language:globalLang},location.origin)}catch(e){}};moduleFrame.src=url;moduleViewer.classList.add('open');document.body.style.overflow='hidden';return}showMessage((button.dataset.name||'Ten moduł')+' nie jest jeszcze dostępny.')}));
+document.querySelectorAll('.module').forEach(button=>button.addEventListener('click',()=>{const url=button.dataset.url;if(url){viewerTitle.textContent=button.querySelector('h4')?.textContent||'Moduł';moduleFrame.src=url;moduleViewer.classList.add('open');document.body.style.overflow='hidden';return}showMessage((button.dataset.name||'Ten moduł')+' nie jest jeszcze dostępny.')}));
 document.getElementById('viewerBack').addEventListener('click',closeModule);document.getElementById('viewerReload').addEventListener('click',()=>{moduleFrame.src=moduleFrame.src});window.addEventListener('message',event=>{if(event.origin===location.origin&&event.data==='vf-open-lobby')closeModule()});
 const VF_T={pl:{loginSub:'Zaloguj się, aby przejść do panelu',login:'Zaloguj',hero:'Wszystkie narzędzia Vedlikehold w jednym miejscu.',modules:'Twoje moduły',chooseApp:'Wybierz aplikację',users:'Użytkownicy',settings:'Ustawienia',logout:'Wyloguj',welcome:'Witaj {name}. Wybierz moduł, aby kontynuować.',role:'Rola'},en:{loginSub:'Sign in to open the dashboard',login:'Sign in',hero:'All Vedlikehold tools in one place.',modules:'Your modules',chooseApp:'Choose an application',users:'Users',settings:'Settings',logout:'Sign out',welcome:'Welcome {name}. Choose a module to continue.',role:'Role'},no:{loginSub:'Logg inn for å åpne kontrollpanelet',login:'Logg inn',hero:'Alle Vedlikehold-verktøy på ett sted.',modules:'Dine moduler',chooseApp:'Velg en applikasjon',users:'Brukere',settings:'Innstillinger',logout:'Logg ut',welcome:'Velkommen {name}. Velg en modul for å fortsette.',role:'Rolle'}};
 let globalLang=localStorage.getItem('vf-language')||'pl',currentProfile=null;
 function applyGlobalLanguage(code,broadcast=true){globalLang=['pl','en','no'].includes(code)?code:'pl';localStorage.setItem('vf-language',globalLang);document.documentElement.lang=globalLang==='no'?'nb':globalLang;document.querySelectorAll('[data-t]').forEach(el=>{let v=VF_T[globalLang][el.dataset.t];if(v)el.textContent=v});document.querySelectorAll('[data-global-lang]').forEach(b=>b.classList.toggle('active',b.dataset.globalLang===globalLang));if(currentProfile){document.getElementById('welcome').textContent=VF_T[globalLang].welcome.replace('{name}',currentProfile.full_name||currentProfile.email||'');document.getElementById('profilePanel').innerHTML='<b>'+(currentProfile.full_name||currentProfile.email||'')+'</b><br>'+VF_T[globalLang].role+': '+(currentProfile.role||'worker')}if(broadcast&&moduleFrame?.contentWindow)moduleFrame.contentWindow.postMessage({type:'vf-language',language:globalLang},location.origin)}
-document.querySelectorAll('[data-global-lang]').forEach(b=>b.addEventListener('click',()=>{applyGlobalLanguage(b.dataset.globalLang);if(moduleViewer.classList.contains('open')&&moduleFrame.src&&moduleFrame.src!=='about:blank'){try{moduleFrame.contentWindow.postMessage({type:'vf-language',language:globalLang},location.origin)}catch(e){}}}));
+document.querySelectorAll('[data-global-lang]').forEach(b=>b.addEventListener('click',()=>applyGlobalLanguage(b.dataset.globalLang)));
 document.getElementById('avatar').addEventListener('click',e=>{e.stopPropagation();document.getElementById('accountMenu').classList.toggle('hidden')});document.addEventListener('click',e=>{if(!e.target.closest('.user'))document.getElementById('accountMenu').classList.add('hidden')});
 document.getElementById('menuLogoutBtn').addEventListener('click',()=>document.getElementById('logoutBtn').click());document.getElementById('settingsBtn').addEventListener('click',()=>showMessage(VF_T[globalLang].settings));
 async function loadLobbyUsers(){document.getElementById('adminStatus').textContent='';let{data,error}=await db.from('profiles').select('*');if(error){document.getElementById('adminStatus').textContent=error.message;return}document.getElementById('usersList').innerHTML=(data||[]).map(u=>'<div class="userRow"><div><b>'+(u.full_name||u.email||u.id)+'</b><small>'+(u.email||'')+'</small></div><select data-user-id="'+u.id+'"><option value="viewer" '+(u.role==='viewer'?'selected':'')+'>viewer</option><option value="worker" '+(u.role==='worker'?'selected':'')+'>worker</option><option value="supervisor" '+(u.role==='supervisor'?'selected':'')+'>supervisor</option><option value="admin" '+(u.role==='admin'?'selected':'')+'>admin</option></select></div>').join('');document.querySelectorAll('[data-user-id]').forEach(sel=>sel.addEventListener('change',async()=>{let r=await db.rpc('admin_set_role',{target_id:sel.dataset.userId,new_role:sel.value});document.getElementById('adminStatus').textContent=r.error?r.error.message:'Zapisano'}))}
