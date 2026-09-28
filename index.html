@@ -40,6 +40,12 @@
 
 .avatar{border:0;color:#fff;cursor:pointer}.accountMenu{position:absolute;right:0;top:56px;width:250px;padding:10px;border:1px solid var(--line);border-radius:18px;background:#0d1d31;box-shadow:var(--shadow);z-index:40}.accountMenu button{display:block;width:100%;padding:12px;border:0;border-radius:11px;background:transparent;color:#dce8f4;text-align:left;font-weight:750}.accountMenu button:hover{background:rgba(59,130,246,.12)}.accountMenu .danger{color:#fca5a5}.languageRow{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:7px}.languageRow button{text-align:center;border:1px solid var(--line)}.languageRow button.active{background:rgba(59,130,246,.22);color:#93c5fd}.adminPanel{position:fixed;inset:0;z-index:150;display:none;padding:calc(18px + env(safe-area-inset-top)) 16px calc(18px + env(safe-area-inset-bottom));background:rgba(2,8,16,.80);backdrop-filter:blur(8px)}.adminPanel.open{display:flex;align-items:center;justify-content:center}.adminSheet{width:min(720px,100%);max-height:90vh;overflow:auto;padding:20px;border:1px solid var(--line);border-radius:24px;background:#0d1d31;box-shadow:var(--shadow)}.adminHead{display:flex;align-items:center;gap:12px}.adminHead h2{flex:1;margin:0}.closeAdmin{min-width:42px;height:42px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.07);color:#fff}.usersList{margin-top:15px;display:grid;gap:10px}.userRow{display:grid;grid-template-columns:1fr 170px;gap:10px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.035)}.userRow small{display:block;color:var(--muted)}.userRow select{width:100%;padding:10px;border:1px solid var(--line);border-radius:11px;background:#07111f;color:#fff}.adminStatus{color:var(--muted);font-size:13px}.profilePanel{padding:10px 12px;color:var(--muted);font-size:13px}
 @media(max-width:620px){.app{padding-top:calc(20px + env(safe-area-inset-top))}.top{margin-top:0}.brand h1{font-size:17px;line-height:1.18}.accountMenu{position:fixed;top:calc(74px + env(safe-area-inset-top));right:13px}.userRow{grid-template-columns:1fr}}
+
+/* FIX: account menu must always render above hero and cards */
+.top{position:relative!important;z-index:80!important;overflow:visible!important}
+.user{position:relative!important;z-index:90!important;overflow:visible!important}
+.accountMenu{z-index:9999!important;isolation:isolate!important}
+.hero,.head,.grid{position:relative;z-index:1}
 </style>
 </head>
 <body>
