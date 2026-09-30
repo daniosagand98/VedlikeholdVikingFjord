@@ -247,8 +247,16 @@ async function loadQuickOverview(){
  day.sort((a,b)=>toMinutes(timeValue(a))-toMinutes(timeValue(b)));
  let first=day.find(o=>timeMatch(timeValue(o))),m=first?timeMatch(timeValue(first)):null;
  document.getElementById('quickTomorrow').textContent=m?m[1].padStart(2,'0')+':'+m[2]:'—';
- const isVakt=o=>{let text=Object.entries(o).filter(([k,v])=>typeof v!=='object'&&/vakt|on.?call|duty|beredskap|dyżur/i.test(k+' '+v)).map(x=>x.join(' ')).join(' ');return /vakt|on.?call|beredskap|dyżur/i.test(text)&&!/false|nei|nie|no|0/i.test(text)};
- document.getElementById('quickVakt').textContent=day.some(isVakt)?t.yes:t.no;
+ const employees=Array.isArray(shift.employees)?shift.employees:[];
+ const ownEmployee=employees.find(e=>identity.some(id=>[e.id,e.email,e.name,e.full_name].filter(Boolean).map(norm).some(v=>v===id||v.includes(id)||id.includes(v))));
+ const tomorrowIso=(()=>{let x=new Date(tomorrow);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)})();
+ const explicit=(shift.vaktAssignments||[]).find(x=>x.date===tomorrowIso);
+ const explicitId=explicit?.employeeId||explicit?.employee_id;
+ const monday=d=>{let x=new Date(d),n=(x.getDay()+6)%7;x.setDate(x.getDate()-n);x.setHours(12,0,0,0);return x};
+ const baseVaktEmployee=()=>{let reference=new Date('2026-09-21T12:00'),weeks=Math.round((monday(tomorrow)-monday(reference))/604800000);return employees.find(e=>!e.reserve&&['05:30','07:00','09:00'][((Number(e.rotation||0)-weeks)%3+3)%3]==='09:00')||null};
+ const assignedEmployee=explicitId?employees.find(e=>String(e.id)===String(explicitId)):baseVaktEmployee();
+ const hasVakt=!!(ownEmployee&&assignedEmployee&&String(ownEmployee.id)===String(assignedEmployee.id));
+ document.getElementById('quickVakt').textContent=hasVakt?t.yes:t.no;
 }    
 async function folderBytes(path=''){let {data,error}=await db.storage.from('work-orders').list(path,{limit:1000});if(error)throw error;let total=0;for(let x of data||[]){if(x.metadata&&Number(x.metadata.size))total+=Number(x.metadata.size);else if(!x.name.includes('.'))total+=await folderBytes(path?path+'/'+x.name:x.name)}return total}
 function fmtBytes(n){if(n>=1073741824)return(n/1073741824).toFixed(2)+' GB';if(n>=1048576)return(n/1048576).toFixed(1)+' MB';return Math.round(n/1024)+' KB'}
