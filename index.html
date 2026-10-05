@@ -392,25 +392,81 @@ setTimeout(()=>renderDynamicNotifications(false),500);
 })();
 </script>
 
-<style id="lobby-final-fixes">
-.workTabs button.is-active{background:linear-gradient(135deg,#2563eb,#38bdf8)!important;border-color:transparent!important;box-shadow:0 9px 22px rgba(37,99,235,.28)!important}.workViewIndicator{display:flex;align-items:center;gap:8px;margin:2px 0 12px;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.04);color:#cfe3f7;font-size:12px;font-weight:850}.workViewIndicator i{width:9px;height:9px;border-radius:50%;background:#60a5fa}.workViewIndicator.closed i{background:#94a3b8}.workViewIndicator.add i{background:#34d399}
+<style id="lobby-final-fixes-v2">
+.workViewIndicator{display:none!important}
+.workTabs button{background:rgba(255,255,255,.05)!important;border:1px solid var(--line)!important;box-shadow:none!important;outline:none!important}
+.workTabs button.is-active{background:rgba(59,130,246,.14)!important;border:2px solid #60a5fa!important;box-shadow:0 0 0 3px rgba(96,165,250,.14),0 8px 22px rgba(0,0,0,.2)!important}
+.workTabs #showWorkHistory.is-active{background:rgba(148,163,184,.12)!important;border-color:#94a3b8!important;box-shadow:0 0 0 3px rgba(148,163,184,.12)!important}
+.workTabs #showWorkForm.is-active{background:rgba(52,211,153,.12)!important;border-color:#34d399!important;box-shadow:0 0 0 3px rgba(52,211,153,.12)!important}
 </style>
-<script id="lobby-final-fixes-script">
+<script id="lobby-final-fixes-script-v2">
 (function(){
-const L={pl:{o:'Aktualny widok: OTWARTE',c:'Aktualny widok: ZAMKNIĘTE',a:'Aktualny widok: DODAWANIE',nw:'Otwarte prace',mh:'Brak wpisu godzin za wczoraj',vm:'Miałeś Vakt wczoraj, ale nie ma wpisu godzin'},en:{o:'Current view: OPEN',c:'Current view: CLOSED',a:'Current view: ADD',nw:'Open works',mh:'Missing hours for yesterday',vm:'You had on-call duty yesterday, but no hours entry exists'},no:{o:'Gjeldende visning: ÅPNE',c:'Gjeldende visning: LUKKEDE',a:'Gjeldende visning: LEGG TIL',nw:'Åpne arbeider',mh:'Manglende timeføring i går',vm:'Du hadde Vakt i går, men timeregistrering mangler'}};
-const tr=()=>L[(typeof globalLang!=='undefined'?globalLang:'pl')]||L.pl,n=v=>String(v??'').trim().toLowerCase(),date=d=>{d=new Date(d);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
-function marker(){let tabs=document.getElementById('workTabs'),e=document.getElementById('workViewIndicator');if(!e&&tabs){e=document.createElement('div');e.id='workViewIndicator';e.className='workViewIndicator';e.innerHTML='<i></i><span></span>';tabs.after(e)}return e}
-function view(v){let ids={open:'showOpenWorks',add:'showWorkForm',closed:'showWorkHistory'};Object.entries(ids).forEach(([k,id])=>document.getElementById(id)?.classList.toggle('is-active',k===v));let e=marker();if(e){e.className='workViewIndicator '+v;e.querySelector('span').textContent=v==='closed'?tr().c:v==='add'?tr().a:tr().o}}
-document.getElementById('showOpenWorks')?.addEventListener('click',()=>view('open'),true);document.getElementById('showWorkHistory')?.addEventListener('click',()=>view('closed'),true);document.getElementById('showWorkForm')?.addEventListener('click',()=>view('add'),true);document.querySelector('[data-work-module="works"]')?.addEventListener('click',()=>setTimeout(()=>view('open'),0));
-function objects(v,out=[],path='root',seen=new WeakSet()){if(!v||typeof v!=='object'||seen.has(v))return out;seen.add(v);out.push({o:v,path});Object.entries(v).forEach(([k,x])=>objects(x,out,path+'/'+k,seen));return out}
-function ids(){return[currentProfile?.id,currentProfile?.email,currentProfile?.full_name].filter(Boolean).map(n)}
-function mine(o){let vals=[];['user_id','employee_id','profile_id','employeeId','email','user_email','name','full_name','assigned_to','user','employee'].forEach(k=>{let v=o?.[k];typeof v==='object'?vals.push(v?.id,v?.email,v?.name,v?.full_name):vals.push(v)});return vals.filter(Boolean).map(n).some(v=>ids().some(i=>v===i||v.includes(i)||i.includes(v)))}
-function od(o){for(let k of['date','day','shift_date','work_date','start_date','datetime','startDate','isoDate'])if(o?.[k]){let d=new Date(o[k]);if(!isNaN(d))return date(d);if(/^\d{4}-\d{2}-\d{2}$/.test(String(o[k])))return String(o[k])}return''}
-function missingPart(o,path){let q=Number(o.quantity??o.qty??o.stock),m=Number(o.minimum??o.min_stock??o.minStock),s=n(o.status),like=n(path).includes('part')||n(path).includes('del')||o.part_name||o.sku;return !!like&&(o.missing===true||o.is_missing===true||s==='missing'||s==='low'||(Number.isFinite(q)&&Number.isFinite(m)&&q<=m))}
-window.collectDynamicNotifications=async function(){let out=[];try{let{data,error}=await db.from('app_state').select('id,payload');if(error)throw error;let rows=data||[],all=[];rows.forEach(r=>objects(r.payload,all,'state/'+r.id));let seen=new Set();all.forEach(({o,path})=>{if(!missingPart(o,path))return;let k=o.id||o.sku||o.name||o.part_name||path;if(seen.has(k))return;seen.add(k);out.push({icon:'📦',title:o.name||o.part_name||'Brakująca część',text:`Stan: ${o.quantity??o.qty??o.stock??0} · minimum: ${o.minimum??o.min_stock??o.minStock??0}`,target:'parts'})});let works=[];try{works=await readWorks()}catch(e){}let open=works.filter(x=>x.status!=='closed');if(open.length)out.push({icon:'🛠️',title:tr().nw,text:String(open.length),target:'works'});let y=new Date();y.setDate(y.getDate()-1);let yd=date(y),hasVakt=all.some(({o,path})=>mine(o)&&od(o)===yd&&(n(path+' '+JSON.stringify(o)).includes('vakt')||o.vakt===true||o.on_call===true)),hasHours=all.some(({o,path})=>mine(o)&&od(o)===yd&&(n(path).includes('hour')||o.hours!==undefined||o.work_date));if(hasVakt&&!hasHours)out.push({icon:'⏱️',title:tr().mh,text:tr().vm,target:'hours'})}catch(e){console.warn(e)}return out};
-window.renderDynamicNotifications=async function(open=false){let list=await collectDynamicNotifications(),q=document.getElementById('quickParts'),l=document.getElementById('quickPartsLabel');if(q)q.textContent=list.length;if(l)l.textContent=list.length?(window.WORK_LANG?.[globalLang]?.notifications||'Powiadomienia'):(window.WORK_LANG?.[globalLang]?.none||'Brak powiadomień');if(open){let b=document.getElementById('notificationList');b.innerHTML=list.length?list.map(x=>`<button class="settingsTile" data-notification-target="${x.target}" type="button">${x.icon} <b>${x.title}</b><br><small>${x.text}</small></button>`).join(''):(window.WORK_LANG?.[globalLang]?.none||'Brak powiadomień');document.getElementById('notificationPanel').classList.add('open')}};
-const SK='vf-state-audit-snapshot';let busy=false;async function log(a,m,d){if(busy||typeof addAuditLog!=='function')return;busy=true;try{await addAuditLog(a,m,d)}finally{busy=false}}async function watch(){if(!currentProfile||busy)return;try{let{data}=await db.from('app_state').select('id,payload'),now={};(data||[]).forEach(r=>now[r.id]=r.payload);let old={};try{old=JSON.parse(localStorage.getItem(SK)||'{}')}catch(e){}if(Object.keys(old).length)for(let id of new Set([...Object.keys(old),...Object.keys(now)])){if(id==='6'||JSON.stringify(old[id])===JSON.stringify(now[id]))continue;let mod=id==='1'?'Grafik/Vakt':id==='3'?'Błędy':id==='4'?'Moduły':id==='5'?'Prace':'Części / Strapex / dane';await log(old[id]===undefined?'Dodano':now[id]===undefined?'Usunięto':'Edytowano',mod,'Wykryto zmianę danych app_state ID '+id)}localStorage.setItem(SK,JSON.stringify(now))}catch(e){console.warn(e)}}
-window.addEventListener('message',e=>{let d=e.data;if(String(e.origin).includes('daniosagand98.github.io')&&d?.type==='vf-audit-log')log(d.action||'Zmiana',d.module||'Moduł',d.details||'')});setInterval(watch,60000);setTimeout(watch,2500);setInterval(()=>renderDynamicNotifications(false),300000);setTimeout(()=>renderDynamicNotifications(false),1200);view('open');
+'use strict';
+const norm=v=>String(v??'').trim().toLowerCase();
+const isoDay=d=>{d=new Date(d);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function setWorkTab(view){const ids={open:'showOpenWorks',add:'showWorkForm',closed:'showWorkHistory'};Object.entries(ids).forEach(([k,id])=>document.getElementById(id)?.classList.toggle('is-active',k===view));document.getElementById('workViewIndicator')?.remove()}
+document.getElementById('showOpenWorks')?.addEventListener('click',()=>setWorkTab('open'),true);
+document.getElementById('showWorkForm')?.addEventListener('click',()=>setWorkTab('add'),true);
+document.getElementById('showWorkHistory')?.addEventListener('click',()=>setWorkTab('closed'),true);
+document.querySelector('[data-work-module="works"]')?.addEventListener('click',()=>setTimeout(()=>setWorkTab('open'),0));
+setWorkTab('open');
+
+function walk(v,out=[],path='',seen=new WeakSet()){if(!v||typeof v!=='object'||seen.has(v))return out;seen.add(v);out.push({o:v,path});if(Array.isArray(v))v.forEach((x,i)=>walk(x,out,path+'/'+i,seen));else Object.entries(v).forEach(([k,x])=>walk(x,out,path+'/'+k,seen));return out}
+function partInfo(o,path){
+ const qtyRaw=o.quantity??o.qty??o.stock??o.current_stock??o.currentStock??o.amount??o.count;
+ const minRaw=o.minimum??o.min??o.min_stock??o.minimum_stock??o.minStock??o.reorder_level??o.reorderLevel;
+ const qty=Number(qtyRaw),min=Number(minRaw),status=norm(o.status??o.stock_status??o.availability);
+ const named=String(o.name??o.part_name??o.title??o.label??o.sku??'').trim();
+ const partLike=!!(named&&(qtyRaw!==undefined||minRaw!==undefined||o.missing!==undefined||status))&&(norm(path).includes('part')||norm(path).includes('del')||o.part_name!==undefined||o.sku!==undefined||minRaw!==undefined);
+ const missing=o.missing===true||o.missing===1||o.is_missing===true||['missing','low','out','out_of_stock','brak','mangler'].includes(status)||(Number.isFinite(qty)&&Number.isFinite(min)&&qty<=min);
+ return partLike&&missing?{name:named||'Część',qty:Number.isFinite(qty)?qty:(qtyRaw??0),min:Number.isFinite(min)?min:(minRaw??0)}:null;
+}
+function currentIds(){return[currentProfile?.id,currentProfile?.email,currentProfile?.full_name].filter(Boolean).map(norm)}
+function belongs(o){let vals=[];['user_id','employee_id','profile_id','employeeId','userId','email','user_email','employee_email','name','full_name','employee','user','assigned_to'].forEach(k=>{let v=o?.[k];if(v&&typeof v==='object')vals.push(v.id,v.email,v.name,v.full_name);else vals.push(v)});return vals.filter(Boolean).map(norm).some(v=>currentIds().some(id=>v===id||v.includes(id)||id.includes(v)))}
+function rowDay(o){for(const k of['date','day','shift_date','work_date','start_date','startDate','isoDate']){let v=o?.[k];if(!v)continue;if(/^\d{4}-\d{2}-\d{2}$/.test(String(v)))return String(v);let d=new Date(v);if(!isNaN(d))return isoDay(d)}return''}
+async function hasHoursEntry(day){try{let{data,error}=await db.from('hours_user_data').select('*').eq('user_id',currentProfile.id).maybeSingle();if(error)return false;let raw=JSON.stringify(data?.payload??data?.data??data??{});return raw.includes(day)}catch(e){return false}}
+function explicitVaktForUser(objects,day){return objects.some(({o,path})=>{if(rowDay(o)!==day||!belongs(o))return false;let type=norm(o.type??o.kind??o.shift_type??o.shift??o.role??path);return o.vakt===true||o.on_call===true||type==='vakt'||type.includes('vaktassignment')||type.includes('on_call')})}
+window.collectDynamicNotifications=async function(){
+ let out=[];
+ try{
+  let{data:rows,error}=await db.from('app_state').select('id,payload');if(error)throw error;rows=rows||[];
+  let all=[];rows.forEach(r=>walk(r.payload,all,'state/'+r.id));
+  let seen=new Set();for(const {o,path} of all){let p=partInfo(o,path);if(!p)continue;let key=norm(o.id??o.part_id??o.sku??p.name);if(seen.has(key))continue;seen.add(key);out.push({icon:'📦',title:p.name,text:`Stan: ${p.qty} · minimum: ${p.min}`,target:'parts'})}
+  let works=[];try{works=await readWorks()}catch(e){}let open=works.filter(x=>x.status!=='closed');if(open.length)out.push({icon:'🛠️',title:'Otwarte prace',text:String(open.length),target:'works'});
+  let y=new Date();y.setDate(y.getDate()-1);let yd=isoDay(y);
+  if(explicitVaktForUser(all,yd)&&!(await hasHoursEntry(yd)))out.push({icon:'⏱️',title:'Brak wpisu godzin',text:'Miałeś Vakt wczoraj. Dodaj wpis godzin za wczoraj.',target:'hours'});
+ }catch(e){console.warn('Powiadomienia:',e.message)}
+ return out;
+};
+window.renderDynamicNotifications=async function(open=false){let list=await collectDynamicNotifications(),q=document.getElementById('quickParts'),l=document.getElementById('quickPartsLabel');if(q)q.textContent=list.length;if(l)l.textContent=list.length?'Powiadomienia':'Brak powiadomień';if(open){let box=document.getElementById('notificationList');box.innerHTML=list.length?list.map(x=>`<button class="settingsTile" data-notification-target="${x.target}" type="button">${x.icon} <b>${x.title}</b><br><small>${x.text}</small></button>`).join(''):'Brak powiadomień';document.getElementById('notificationPanel').classList.add('open')}};
+
+const AUDIT_SNAPSHOT_ID=7;
+function cleanState(rows){let x={};(rows||[]).forEach(r=>{if(![AUDIT_STATE_ID,AUDIT_SNAPSHOT_ID].includes(Number(r.id)))x[r.id]=r.payload});return x}
+function displayName(x){return String(x?.name??x?.part_name??x?.title??x?.label??x?.machine_name??x?.sku??x?.id??'element')}
+function actorFrom(x){return String(x?.updated_by_name??x?.changed_by_name??x?.created_by_name??x?.user_name??x?.updated_by??x?.changed_by??x?.created_by??'Nieznany użytkownik')}
+function flattenNamed(v,out=[],seen=new WeakSet()){if(!v||typeof v!=='object'||seen.has(v))return out;seen.add(v);if(!Array.isArray(v)&&(v.id!==undefined||v.name||v.part_name||v.title||v.machine_name||v.sku))out.push(v);Object.values(v).forEach(x=>flattenNamed(x,out,seen));return out}
+function mapItems(v){let m=new Map();for(const x of flattenNamed(v)){let k=String(x.id??x.part_id??x.sku??x.name??x.part_name??x.title??x.machine_name);if(k)m.set(k,x)}return m}
+async function appendHistoricalLog(action,moduleName,details,actor){try{let logs=await readAuditLogs();logs.unshift({id:crypto.randomUUID(),created_at:new Date().toISOString(),user_id:null,user_name:actor||'Nieznany użytkownik',user_role:'history',action,module:moduleName,details});logs=logs.slice(0,2000);let{error}=await db.from('app_state').upsert({id:AUDIT_STATE_ID,payload:{logs}},{onConflict:'id'});if(error)throw error}catch(e){console.warn('Historia logów:',e.message)}}
+async function persistAuditHistory(){
+ if(!currentProfile)return;
+ try{
+  let{data:rows,error}=await db.from('app_state').select('id,payload');if(error)throw error;
+  let now=cleanState(rows),snapRow=(rows||[]).find(r=>Number(r.id)===AUDIT_SNAPSHOT_ID),before=snapRow?.payload?.state||null;
+  if(before){for(const id of new Set([...Object.keys(before),...Object.keys(now)])){
+   if(JSON.stringify(before[id])===JSON.stringify(now[id]))continue;
+   let moduleName=String(id)==='1'?'Grafik / Vakt':String(id)==='3'?'Błędy':String(id)==='4'?'Moduły':String(id)==='5'?'Prace':'Części / Strapex';
+   let a=mapItems(before[id]),b=mapItems(now[id]);
+   for(const[k,x]of b)if(!a.has(k))await appendHistoricalLog('Dodano',moduleName,displayName(x),actorFrom(x));
+   for(const[k,x]of a)if(!b.has(k))await appendHistoricalLog('Usunięto',moduleName,displayName(x),actorFrom(x));
+   for(const[k,x]of b)if(a.has(k)&&JSON.stringify(a.get(k))!==JSON.stringify(x))await appendHistoricalLog('Edytowano',moduleName,displayName(x),actorFrom(x));
+   if(!a.size&&!b.size)await appendHistoricalLog('Zmieniono',moduleName,'Zmieniono dane modułu','Nieznany użytkownik');
+  }}
+  await db.from('app_state').upsert({id:AUDIT_SNAPSHOT_ID,payload:{state:now,updated_at:new Date().toISOString()}},{onConflict:'id'});
+ }catch(e){console.warn('Trwała historia:',e.message)}
+}
+setTimeout(()=>{renderDynamicNotifications(false);persistAuditHistory()},1800);
+setInterval(()=>{renderDynamicNotifications(false);persistAuditHistory()},300000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentProfile){renderDynamicNotifications(false);persistAuditHistory()}});
 })();
 </script>
 
