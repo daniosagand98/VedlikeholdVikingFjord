@@ -520,5 +520,45 @@ const oa=window.applyGlobalLanguage;window.applyGlobalLanguage=function(x,b=true
  setTimeout(markLobbyUpdated,500);
 })();
 </script>
+
+<style id="lobby-clock-edit-fix-2026-10-15">
+.workClockCard #quickParts{font-size:25px!important;line-height:1!important}
+.workClockCard:not(.is-running) #quickParts{color:#86efac!important}
+.workClockCard.is-running #quickParts{color:#fecaca!important}
+.clockStartedAt{display:block!important;margin-top:5px;color:#bbf7d0!important;font-size:12px!important;font-weight:800!important;text-decoration:underline;text-underline-offset:3px}
+.workClockCard.is-running .clockStartedAt{color:#fecaca!important}
+.clockEditPanel{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(2,8,16,.88);backdrop-filter:blur(8px)}
+.clockEditPanel.open{display:flex}.clockEditSheet{width:min(430px,100%);padding:20px;border:1px solid var(--line);border-radius:22px;background:#0d1d31;box-shadow:var(--shadow)}
+.clockEditSheet h2{margin:0 0 6px}.clockEditSheet p{margin:0 0 14px;color:var(--muted)}.clockEditSheet input{width:100%;padding:13px;border:1px solid #334a62;border-radius:12px;background:#07111f;color:#fff;color-scheme:dark}
+.clockEditActions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.clockEditActions button{min-height:44px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.06);color:#fff;font-weight:850}.clockEditActions .save{border:0;background:linear-gradient(135deg,#2563eb,#38bdf8)}
+</style>
+<section id="clockEditPanel" class="clockEditPanel" aria-label="Edycja godziny rozpoczęcia"><div class="clockEditSheet"><h2 id="clockEditTitle">Edytuj godzinę startu</h2><p id="clockEditHint">Zmień godzinę, jeśli Start został kliknięty za późno.</p><input id="clockEditInput" type="datetime-local"><div class="clockEditActions"><button id="clockEditCancel" type="button">Anuluj</button><button id="clockEditSave" class="save" type="button">Zapisz</button></div></div></section>
+<script id="lobby-clock-and-tomorrow-fix-2026-10-15">
+(()=>{'use strict';
+ const SID=9,pad=n=>String(n).padStart(2,'0'),norm=v=>String(v??'').trim().toLowerCase();
+ const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+ const tomorrowKeys=()=>{let d=new Date();d.setDate(d.getDate()+1);return[iso(d),pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear(),pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()]};
+ const ids=()=>[currentProfile?.id,currentProfile?.email,currentProfile?.full_name,currentProfile?.name].filter(Boolean).map(norm);
+ function hasIdentity(value,path=''){let text=norm(path+' '+(typeof value==='object'?JSON.stringify(value):value));return ids().some(x=>x&&text.includes(x))}
+ function timeFrom(value){let text=typeof value==='string'||typeof value==='number'?String(value):JSON.stringify(value??'');let m=text.match(/(?:^|[T\s"':])(\d{1,2}):(\d{2})(?=$|[^\d])/);if(!m)return null;let h=Number(m[1]),mi=Number(m[2]);return h<24&&mi<60?pad(h)+':'+pad(mi):null}
+ function collectTomorrow(value,path='',out=[]){if(value==null)return out;let day=tomorrowKeys(),pathHasDay=day.some(k=>norm(path).includes(norm(k))),valueHasDay=typeof value==='object'&&day.some(k=>norm(JSON.stringify(value)).includes(norm(k)));if((pathHasDay||valueHasDay)&&hasIdentity(value,path)){let t=timeFrom(value);if(t)out.push(t)}if(Array.isArray(value))value.forEach((v,i)=>collectTomorrow(v,path+'/'+i,out));else if(typeof value==='object')Object.entries(value).forEach(([k,v])=>collectTomorrow(v,path+'/'+k,out));return out}
+ async function repairTomorrow(){try{let r=await db.from('app_state').select('payload').eq('id',1).maybeSingle();if(r.error)throw r.error;let times=[...new Set(collectTomorrow(r.data?.payload||{}))].sort();let el=document.getElementById('quickTomorrow');if(el&&(el.textContent==='—'||times.length))el.textContent=times[0]||'—'}catch(e){console.warn('Jutro:',e.message)}}
+ const oldQuick=window.loadQuickOverview;window.loadQuickOverview=async function(){let r=await oldQuick();await repairTomorrow();return r};
+ async function clockState(){let r=await db.from('app_state').select('payload').eq('id',SID).maybeSingle();if(r.error)throw r.error;return r.data?.payload||{active:{}}}
+ async function saveClockState(x){let r=await db.from('app_state').upsert({id:SID,payload:x},{onConflict:'id'});if(r.error)throw r.error}
+ async function ownActive(){let x=await clockState();return{x,a:x.active?.[currentProfile?.id]||null}}
+ function clockText(a){let q=document.getElementById('quickParts'),l=document.getElementById('quickPartsLabel'),card=document.getElementById('quickPartsCard');if(!q||!l||!card)return;card.classList.toggle('is-running',!!a);q.textContent=a?'■':'▶';l.innerHTML=a?'Koniec<span class="clockStartedAt" data-edit-clock="1">Start: '+new Date(a.started_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+' · edytuj</span>':'Start'}
+ const panel=document.getElementById('clockEditPanel'),input=document.getElementById('clockEditInput');
+ function localValue(d){let z=new Date(d);z.setMinutes(z.getMinutes()-z.getTimezoneOffset());return z.toISOString().slice(0,16)}
+ async function openEditor(){try{let {a}=await ownActive();if(!a)return;input.value=localValue(a.started_at);panel.classList.add('open')}catch(e){showMessage(e.message)}}
+ document.addEventListener('click',e=>{if(e.target.closest('[data-edit-clock]')){e.preventDefault();e.stopImmediatePropagation();openEditor()}},true);
+ document.getElementById('clockEditCancel').onclick=()=>panel.classList.remove('open');panel.addEventListener('click',e=>{if(e.target===panel)panel.classList.remove('open')});
+ document.getElementById('clockEditSave').onclick=async()=>{try{let d=new Date(input.value);if(isNaN(d))return showMessage('Wybierz prawidłową godzinę');if(d>new Date())return showMessage('Godzina startu nie może być w przyszłości');let {x,a}=await ownActive();if(!a)return panel.classList.remove('open');a.started_at=d.toISOString();x.active[currentProfile.id]=a;await saveClockState(x);clockText(a);panel.classList.remove('open');showMessage('Godzina startu została zmieniona')}catch(e){showMessage(e.message)}};
+ const oldOpen=window.openLobby;window.openLobby=async function(u){await oldOpen(u);try{clockText((await ownActive()).a)}catch(e){}await repairTomorrow()};
+ document.addEventListener('visibilitychange',async()=>{if(!document.hidden&&currentProfile){try{clockText((await ownActive()).a)}catch(e){}await repairTomorrow()}});
+ setTimeout(async()=>{if(currentProfile){try{clockText((await ownActive()).a)}catch(e){}await repairTomorrow()}},2200);
+})();
+</script>
+
 </body>
 </html>
